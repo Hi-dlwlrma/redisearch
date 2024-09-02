@@ -1,8 +1,13 @@
 from typing import Any, Optional
-
+from fastapi import APIRouter
 from fastapi.encoders import jsonable_encoder
 from starlette import status
 from starlette.responses import JSONResponse
+from src.schemas.schema import User
+
+from src.services import service
+
+api_router = APIRouter()
 
 
 def success_response(response_data: Optional[Any] = None) -> JSONResponse:
@@ -34,3 +39,9 @@ def error_response(
         response_json["errors"] = jsonable_encoder(errors)
 
     return JSONResponse(response_json, status_code=status_code)
+
+
+@api_router.post("/insert")
+async def insert_user(user: User) -> JSONResponse:
+    response = service.insert(user)
+    return success_response(response)
