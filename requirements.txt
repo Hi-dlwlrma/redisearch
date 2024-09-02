@@ -1,2 +1,2 @@
-redisearch
-flask
+redisearch==2.0.0
+environs==11.0.0
