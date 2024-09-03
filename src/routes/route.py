@@ -42,6 +42,18 @@ def error_response(
 
 
 @api_router.post("/insert")
-async def insert_user(request: Request) -> JSONResponse:
+async def insert_brand(request: Request) -> JSONResponse:
     response = service.insert(request)
+    return success_response(response)
+
+
+@api_router.put("/update")
+async def update_brand(request_id: str, request: Request) -> JSONResponse:
+    response = service.update(request_id, request)
+    return success_response(response)
+
+
+@api_router.delete("/delete")
+async def delete_brand(request_id: str) -> JSONResponse:
+    response = service.delete(request_id)
     return success_response(response)

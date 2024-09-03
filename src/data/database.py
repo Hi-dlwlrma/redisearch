@@ -1,5 +1,5 @@
 from redis import Redis, ResponseError
-from redisearch import Client, IndexDefinition, TextField
+from redisearch import Client, IndexDefinition, TextField, Query
 
 from src.config import REDIS_HOST, REDIS_PORT
 
@@ -41,3 +41,20 @@ class Redisearch:
             print(f"Index '{self.index_name}' deleted successfully.")
         except ResponseError as e:
             print(f"Error deleting index '{self.index_name}': {str(e)}")
+
+    def retrieve_all_items(self):
+        """Retrieves all items from the Redisearch index."""
+        try:
+            # Use a query that matches all documents
+            query = Query("*").paging(0, 1000)  # Adjust the limit if needed
+            results = self.client.search(query)
+
+            # Collect the documents into a list
+            items = [doc.__dict__ for doc in results.docs]
+            for item in items:
+                print(item)
+            print(f"Retrieved {len(items)} items from index '{self.index_name}'.")
+            return items
+        except ResponseError as e:
+            print(f"Error retrieving items from index '{self.index_name}': {str(e)}")
+            return []
