@@ -1,77 +1,37 @@
 from src.data.database import Redisearch
-from src.schemas.schema import User
+from src.schemas.schema import Request
 
 
-def insert(user: User):
-    redisearch = Redisearch("idx:test")
-    redisearch.client.redis.hset(f"doc:{user.id}", mapping=user)
-    print("Succeed to insert a user.")
+def insert(request: Request, index_name="idx:test"):
+    """Inserts a new request document into the Redisearch index."""
+    redisearch = Redisearch(index_name)
+    try:
+        # Insert the into Redis using hset
+        redisearch.client.redis.hset(f"doc:{request.id}", mapping=request.dict())
+        print(f"Inserted request with ID: {request.id}")
+    except Exception as e:
+        print(f"Failed to insert request with ID: {request.id}: {str(e)}")
 
 
-def delete(user_id: str):
-    redisearch = Redisearch("idx:test")
-    redisearch.client.delete(user_id)
+def delete(request_id: str, index_name="idx:test"):
+    """Deletes a request document from the Redisearch index."""
+    redisearch = Redisearch(index_name)
+    try:
+        # Delete the request document from Redisearch
+        redisearch.client.delete_document(f"doc:{request_id}")
+        print(f"Deleted request with ID: {request_id}")
+    except Exception as e:
+        print(f"Failed to delete request with ID {request_id}: {str(e)}")
 
 
-def update(user_id: str, user: User):
-    redisearch = Redisearch("idx:test")
-    redisearch.client.hset(user_id, mapping={"name": user.name})
-
-
-# def search(self, query: str):
-#     query = Query(q).return_fields("name")
-#     results = redisearch_client.search(query)
-#     brands = [{"id": doc.id, "name": doc.name} for doc in results.docs]
-#     return {"brands": brands}
-
-# def search(self):
-#     offset = 0
-#     limit = 10
-#     queryString = ""
-
-#     if request.args.get("offset"):
-#         offset = int(request.args.get("offset"))
-
-#     if request.args.get("limit"):
-#         limit = int(request.args.get("limit"))
-
-#     if request.args.get("q"):
-#         queryString = request.args.get("q")
-#     q = Query(queryString).with_scores().paging(offset, limit)
-#     if request.args.get("sortby"):
-#         ascending = True
-#         if request.args.get("ascending"):
-#             ascending = (
-#                 request.args.get("ascending").lower() == "true"
-#                 or request.args.get("ascending") == "1"
-#             )
-
-#         q.sort_by(request.args.get("sortby"), asc=ascending)
-
-#     searchResult = conn.ft(index_name=redis_index).search(q)
-
-#     dictResult = {
-#         "meta": {
-#             "totalResults": getattr(searchResult, "total"),
-#             "offset": offset,
-#             "limit": limit,
-#             "queryString": queryString,
-#         },
-#         "docs": self.docs_to_dict(searchResult.docs),
-#     }
-
-#     return dictResult
-
-
-def docs_to_dict(self, docs):
-    reslist = []
-    for doc in docs:
-        meta = {"id": getattr(doc, "id"), "score": getattr(doc, "score")}
-        fields = {}
-        for field in dir(doc):
-            if field.startswith("__") or field == "id" or field == "score":
-                continue
-            fields.update({field: getattr(doc, field)})
-        ddict = {"meta": meta, "fields": fields}
-        reslist.append(ddict)
-    return reslist
+def update(request_id: str, request: Request, index_name="idx:test"):
+    """Updates a request document in the Redisearch index."""
+    redisearch = Redisearch(index_name)
+    try:
+        # Update the request document in Redis using hset
+        redisearch.client.redis.hset(
+            f"doc:{request_id}", mapping={"name": request.name}
+        )
+        print(f"Updated request with ID: {request_id}")
+    except Exception as e:
+        print(f"Failed to update request with ID: {request_id}: {str(e)}")
