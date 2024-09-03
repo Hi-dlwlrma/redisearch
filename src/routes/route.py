@@ -4,7 +4,7 @@ from fastapi.encoders import jsonable_encoder
 from starlette import status
 from starlette.responses import JSONResponse
 
-from src.schemas.schema import Request
+from src.schemas import schema, response
 from src.services import service
 
 api_router = APIRouter()
@@ -41,19 +41,27 @@ def error_response(
     return JSONResponse(response_json, status_code=status_code)
 
 
-@api_router.post("/insert")
-async def insert_brand(request: Request) -> JSONResponse:
+@api_router.post("/insert", response_model=response.MovieResponse)
+async def insert_movie(request: schema.Movie) -> JSONResponse:
     response = service.insert(request)
+    print(response)
     return success_response(response)
 
 
-@api_router.put("/update")
-async def update_brand(request_id: str, request: Request) -> JSONResponse:
+@api_router.put("/update", response_model=response.MovieResponse)
+async def update_movie(request_id: str, request: schema.Movie) -> JSONResponse:
     response = service.update(request_id, request)
+    print(response)
     return success_response(response)
 
 
-@api_router.delete("/delete")
-async def delete_brand(request_id: str) -> JSONResponse:
-    response = service.delete(request_id)
+@api_router.delete("/delete", response_model=response.BaseResponse)
+async def delete_movie(request_id: str) -> JSONResponse:
+    service.delete(request_id)
+    return success_response()
+
+
+@api_router.get("/search", response_model=response.MovieListResponse)
+async def search_movie(search_term: str, field: str) -> JSONResponse:
+    response = service.search(search_term, field)
     return success_response(response)

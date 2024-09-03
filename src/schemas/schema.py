@@ -1,6 +1,12 @@
 from pydantic import BaseModel
+from typing import List
 
 
-class Request(BaseModel):
+class Movie(BaseModel):
     id: str
-    name: str
+    title: str
+    director: str
+    genres: List[str]
+    overview: str
+    vote_average: float
+    vote_count: int
